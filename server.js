@@ -9,6 +9,7 @@ const PORT = 3000;
 // Middleware для автоматичного парсингу JSON-тіла запиту
 app.use(express.json());
 
+
 // --- MIDDLEWARE ---
 const authMiddleware = (req, res, next) => {
   const login = req.headers['x-login'];
@@ -35,13 +36,25 @@ const adminOnlyMiddleware = (req, res, next) => {
 
   next();
 };
+const loggingMiddleware = (req, res, next) => {
+  // Отримуємо поточний час, HTTP метод та URL запиту
+  const timestamp = new Date().toISOString();
+  const method = req.method;
+  const url = req.url;
+app.use(loggingMiddleware);
+  // Виводимо інформацію в консоль
+  console.log(`[${timestamp}] ${method} ${url}`);
 
+  // ВАЖЛИВО: передаємо управління наступному middleware
+  // Якщо не викликати next(), обробка запиту "зависне" на цьому місці
+
+  next();
 // --- МАРШРУТИ ДЛЯ РЕСУРСІВ --
 
 // Отримання документів
 app.get('/documents', authMiddleware, (req, res) => {
   res.status(200).json(documents);
-});
+})};
 
 // Створення документа
 app.post('/documents', authMiddleware, (req, res) => {
